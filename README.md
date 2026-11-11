@@ -8,7 +8,7 @@ against brute-force bots routinely misclassify legitimate agent activity.
 
 ## What I'm working on
 
-- **[go-stealth](https://github.com/anatolykoptev/go-stealth)** — TLS fingerprinting, proxy rotation, and anti-ban toolkit for Go
+- **[go-stealth](https://github.com/anatolykoptev/go-stealth)** — TLS fingerprinting, proxy rotation, and rate-limit handling for Go
 - **[go-browser](https://github.com/anatolykoptev/go-browser)** — stealth Chrome runtime for autonomous AI agents performing authorized tasks (bookings, form filling, research)
 - **[go-twitter](https://github.com/anatolykoptev/go-twitter)** — anti-bot research against X/Twitter (account pool, xtid, CAPTCHA handling)
 - **[go-threads](https://github.com/anatolykoptev/go-threads)** — Threads.net GraphQL research with LSD token auth and TLS fingerprinting
