@@ -59,12 +59,13 @@ PRODUCTS = [
     },
 ]
 
+# (name, wide-plate lines, narrow-plate line, gate before the step)
 STEPS = [
-    ("Spec", ["Claude Code and I,", "to the architecture I set"], False),
-    ("Implement", ["Devin, in an isolated", "git worktree"], False),
-    ("Review", ["Codex reviews the PR,", "then I read the change"], False),
-    ("Merge", ["Every check green, head", "is the reviewed commit"], True),
-    ("Deploy", ["A GitHub release", "triggers the deploy"], True),
+    ("Spec", ["Claude Code and I,", "to my architecture"], "Claude Code and I, to the architecture I set", False),
+    ("Implement", ["Devin, isolated", "git worktree"], "Devin, in an isolated git worktree", False),
+    ("Review", ["Codex reviews it,", "then I read it"], "Codex reviews the PR, then I read the change", False),
+    ("Merge", ["Checks green, head", "is the reviewed one"], "Every check green, head is the reviewed commit", True),
+    ("Deploy", ["A GitHub release", "triggers it"], "A GitHub release triggers the deploy", True),
 ]
 KEY = "Gate: the change waits here until the step before it passes."
 METHOD_ALT = (
@@ -138,27 +139,23 @@ class Svg:
             f.write(svg)
 
 
-def dates(s, p, x, y, size, anchor_end=False):
+def dates(s, p, x, y, size):
     a, b = p["dates"]
     gap, length = size * 0.55, size * 1.1
-    if anchor_end:
-        _, wb = s.line(b, "mono", size, 0, 0)
-        _, wa = s.line(a, "mono", size, 0, 0)
-        x -= wa + wb + 2 * gap + length
     end = s.text(a, "mono", size, x, y, "mute")
     s.arrow(end + gap, y - size * 0.36, length, "mute")
-    s.text(b, "mono", size, end + 2 * gap + length, y, "mute")
+    return s.text(b, "mono", size, end + 2 * gap + length, y, "mute")
 
 
 def product(line, p, theme, wide, first, last):
     if wide:
-        s = Svg(line, 846, 86, theme, p["alt"])
-        dates(s, p, 0, 37, 12.5)
-        s.text(p["name"], "InterDisplay-SemiBold", 25, 196, 39, "strong", tracking=-0.02)
-        s.text(p["line"], "body", 15, 196, 64, "body")
-        s.text(p["proof"], "mono", 12.5, 532, 37, "strong")
-        s.text(p["state"], "mono", 12.5, 532, 62, "mute")
-        s.out_arrow(835, 28, "accent")
+        s = Svg(line, 680, 80, theme, p["alt"])
+        s.text(p["name"], "InterDisplay-SemiBold", 24, 0, 36, "strong", tracking=-0.02)
+        s.text(p["line"], "body", 15, 0, 60, "body")
+        s.text(p["proof"], "mono", 12.5, 384, 34, "strong")
+        end = dates(s, p, 384, 59, 12.5)
+        s.text("· " + p["state"], "mono", 12.5, end + 8, 59, "mute")
+        s.out_arrow(670, 25, "accent")
     else:
         s = Svg(line, 320, 108, theme, p["alt"])
         s.text(p["name"], "InterDisplay-SemiBold", 21, 0, 34, "strong", tracking=-0.02)
@@ -176,30 +173,30 @@ def product(line, p, theme, wide, first, last):
 
 def method(line, theme, wide):
     if wide:
-        s = Svg(line, 846, 146, theme, METHOD_ALT)
-        col, y = 846 / 5, 14
-        s.parts.append(f'<path d="M5 {y}H846" stroke="{s.c["line"]}" stroke-width="1.5"/>')
-        for i, (name, lines, gated) in enumerate(STEPS):
+        s = Svg(line, 680, 140, theme, METHOD_ALT)
+        col, y = 680 / 5, 14
+        s.parts.append(f'<path d="M5 {y}H680" stroke="{s.c["line"]}" stroke-width="1.5"/>')
+        for i, (name, lines, _, gated) in enumerate(STEPS):
             x = i * col
             if gated:
-                s.gate(x - 22, y)
+                s.gate(x - 18, y)
             s.node(x + 5, y)
-            s.text(name, "InterDisplay-SemiBold", 18, x, 50, "strong", tracking=-0.015)
+            s.text(name, "InterDisplay-SemiBold", 17, x, 48, "strong", tracking=-0.015)
             for j, t in enumerate(lines):
-                s.text(t, "body", 13, x, 74 + j * 19, "body")
-        s.gate(7, 131, 5.5)
-        s.text(KEY, "body", 12.5, 22, 135.5, "mute")
+                s.text(t, "body", 12.5, x, 70 + j * 18, "body")
+        s.gate(7, 125, 5.5)
+        s.text(KEY, "body", 12.5, 22, 129.5, "mute")
     else:
         s = Svg(line, 320, 348, theme, METHOD_ALT)
         tx, pitch, top = 7, 62, 12
         s.parts.append(f'<path d="M{tx} {top}V{top + 4 * pitch}" stroke="{s.c["line"]}" stroke-width="1.5"/>')
-        for i, (name, lines, gated) in enumerate(STEPS):
+        for i, (name, _, text, gated) in enumerate(STEPS):
             y = top + i * pitch
             if gated:
                 s.gate(tx, y - 24)
             s.node(tx, y)
             s.text(name, "InterDisplay-SemiBold", 17, 28, y + 6, "strong", tracking=-0.015)
-            s.text(" ".join(lines), "body", 12, 28, y + 25, "body")
+            s.text(text, "body", 12, 28, y + 25, "body")
         ky = top + 4 * pitch + 62
         s.gate(tx, ky - 4, 5.5)
         s.text("Gate: the change waits here until", "body", 12, 28, ky, "mute")
